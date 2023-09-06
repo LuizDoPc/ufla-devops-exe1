@@ -1,0 +1,43 @@
+version: '3.3'
+
+networks:
+  teste-net:
+    driver: bridge
+
+volumes:
+  pg-vol:
+
+services:
+  postgres:
+    image: postgres:9.6
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: teste
+    volumes:
+      - pg-vol:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      - teste-net
+  nginx:
+    image: nginx:1.17.6
+    container_name: nginx
+    restart: always
+    ports:
+      - 80:80
+  app:
+    image: exe3
+    container_name: app
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    networks:
+      - teste-net
+    depends_on:
+      - postgres
